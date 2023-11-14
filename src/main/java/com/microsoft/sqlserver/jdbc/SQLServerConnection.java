@@ -1502,7 +1502,7 @@ public class SQLServerConnection implements ISQLServerConnection, java.io.Serial
     final void initResettableValues() {
         setLockTimeout();
         rolledBackTransaction = false;
-        transactionIsolationLevel = Connection.TRANSACTION_READ_COMMITTED;// default isolation level
+        transactionIsolationLevel = SQLServerConnection.TRANSACTION_SNAPSHOT;// default isolation level
         maxFieldSize = 0; // default: 0 --> no limit
         maxRows = 0; // default: 0 --> no limit
         databaseAutoCommitMode = true;// auto commit mode
@@ -4275,9 +4275,10 @@ public class SQLServerConnection implements ISQLServerConnection, java.io.Serial
      * @return the syntax string
      */
     private String sqlStatementToInitialize() {
-        String s = null;
+        String s = " set transaction isolation level snapshot";
+        transactionIsolationLevel = SQLServerConnection.TRANSACTION_SNAPSHOT;
         if (nLockTimeout > -1)
-            s = " set lock_timeout " + nLockTimeout;
+            s = s + " set lock_timeout " + nLockTimeout;
         return s;
     }
 
@@ -4315,19 +4316,19 @@ public class SQLServerConnection implements ISQLServerConnection, java.io.Serial
 
         switch (transactionIsolationLevel) {
             case Connection.TRANSACTION_READ_UNCOMMITTED: {
-                sql = sql + " read uncommitted ";
+                sql = sql + " snapshot ";
                 break;
             }
             case Connection.TRANSACTION_READ_COMMITTED: {
-                sql = sql + " read committed ";
+                sql = sql + " snapshot ";
                 break;
             }
             case Connection.TRANSACTION_REPEATABLE_READ: {
-                sql = sql + " repeatable read ";
+                sql = sql + " snapshot ";
                 break;
             }
             case Connection.TRANSACTION_SERIALIZABLE: {
-                sql = sql + " serializable ";
+                sql = sql + " snapshot ";
                 break;
             }
             case SQLServerConnection.TRANSACTION_SNAPSHOT: {
